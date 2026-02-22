@@ -1,0 +1,159 @@
+{% load i18n %}
+{% load djicons %}
+
+<div class="p-4" x-data="variablesApp()">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div>
+            <h2 class="text-xl font-semibold">{% trans "Template Variables" %}</h2>
+            <p class="text-sm text-muted mt-1">{% trans "Variables available for use in document templates" %}</p>
+        </div>
+        <button class="btn color-primary" @click="showCreateForm = true">
+            {% icon "add-outline" %}
+            {% trans "Add Variable" %}
+        </button>
+    </div>
+
+    {% if grouped_variables %}
+        {% for group_name, vars in grouped_variables.items %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="card-title">
+                    {% icon "folder-outline" css_class="text-primary" %}
+                    {{ group_name }}
+                    <span class="badge badge-sm ml-2">{{ vars|length }}</span>
+                </h3>
+            </div>
+            <div class="list">
+                {% for var in vars %}
+                <div class="list-item">
+                    <div class="list-item-content">
+                        <div class="list-item-label">
+                            <code class="text-sm bg-base-200 px-2 py-0.5 rounded">{% templatetag openvariable %}{{ var.name }}{% templatetag closevariable %}</code>
+                        </div>
+                        {% if var.description %}
+                        <div class="list-item-note">{{ var.description }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="list-item-end flex items-center gap-2">
+                        <span class="badge badge-sm">{{ var.get_data_type_display }}</span>
+                        {% if var.example_value %}
+                        <span class="text-xs text-muted">{{ var.example_value }}</span>
+                        {% endif %}
+                        {% if var.is_system %}
+                        <span class="badge badge-sm color-primary">{% trans "System" %}</span>
+                        {% else %}
+                        <button class="btn btn-ghost btn-sm btn-circle text-error"
+                            hx-post="{% url 'doc_templates:variable_delete' var.pk %}"
+                            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                            hx-swap="none"
+                            hx-confirm="{% trans 'Delete this variable?' %}"
+                            hx-on::after-request="if(event.detail.successful) location.reload();">
+                            {% icon "trash-outline" css_class="text-sm" %}
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="card">
+            <div class="card-body text-center py-12">
+                {% icon "code-outline" css_class="text-5xl block mx-auto mb-3 text-muted" %}
+                <h3 class="text-lg font-medium mb-2">{% trans "No variables defined" %}</h3>
+                <p class="text-muted mb-4">{% trans "Add variables to use in your templates." %}</p>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Create Variable Modal -->
+    <div class="modal-backdrop" :data-state="showCreateForm ? 'open' : 'closed'" @click.self="showCreateForm = false">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">{% trans "New Variable" %}</h3>
+                <button class="modal-close" @click="showCreateForm = false">&times;</button>
+            </div>
+            <div class="modal-body">
+                {% csrf_token %}
+                <div class="space-y-4">
+                    <div class="form-group">
+                        <label class="form-group-label">{% trans "Name" %}</label>
+                        {{ form.name }}
+                        <p class="text-xs text-muted mt-1">{% trans "e.g. custom.loyalty_points" %}</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-group-label">{% trans "Description" %}</label>
+                        {{ form.description }}
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="form-group">
+                            <label class="form-group-label">{% trans "Group" %}</label>
+                            {{ form.variable_group }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-group-label">{% trans "Data Type" %}</label>
+                            {{ form.data_type }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-group-label">{% trans "Example Value" %}</label>
+                        {{ form.example_value }}
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" @click="showCreateForm = false">{% trans "Cancel" %}</button>
+                <button class="btn color-primary" @click="createVariable()">
+                    {% icon "add-outline" %}
+                    {% trans "Create" %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function variablesApp() {
+    return {
+        showCreateForm: false,
+
+        async createVariable() {
+            const form = {
+                name: document.querySelector('[name="name"]').value,
+                description: document.querySelector('[name="description"]').value,
+                variable_group: document.querySelector('[name="variable_group"]').value,
+                data_type: document.querySelector('[name="data_type"]').value,
+                example_value: document.querySelector('[name="example_value"]').value,
+            };
+
+            const formData = new FormData();
+            Object.entries(form).forEach(([k, v]) => formData.append(k, v));
+
+            try {
+                const response = await fetch('{% url "doc_templates:variable_create" %}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    },
+                    body: formData,
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    this.showCreateForm = false;
+                    location.reload();
+                } else {
+                    if (window.UX && window.UX.toast) {
+                        window.UX.toast('{% trans "Error creating variable" %}', { type: 'error' });
+                    }
+                }
+            } catch (error) {
+                console.error('[DocTemplates] Error:', error);
+            }
+        },
+    };
+}
+</script>

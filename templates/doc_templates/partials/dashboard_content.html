@@ -1,0 +1,137 @@
+{% load i18n %}
+{% load djicons %}
+
+<div class="p-4">
+    <!-- Header with stats and create button -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div>
+            <h2 class="text-xl font-semibold">{% trans "Document Templates" %}</h2>
+            <p class="text-sm text-muted mt-1">
+                {{ total_count }} {% trans "templates" %} &middot; {{ active_count }} {% trans "active" %}
+            </p>
+        </div>
+        <button class="btn color-primary"
+            hx-get="{% url 'doc_templates:template_create' %}"
+            hx-target="#main-content-area"
+            hx-push-url="true">
+            {% icon "add-outline" %}
+            {% trans "New Template" %}
+        </button>
+    </div>
+
+    {% if grouped_templates %}
+        {% for doc_type, templates in grouped_templates.items %}
+        <div class="mb-6">
+            <h3 class="text-lg font-medium mb-3 flex items-center gap-2">
+                {% icon "document-text-outline" css_class="text-primary" %}
+                {{ doc_type }}
+                <span class="badge badge-sm">{{ templates|length }}</span>
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for tpl in templates %}
+                <div class="card" x-data="{ showActions: false }">
+                    <div class="card-body p-4">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <h4 class="font-medium truncate">{{ tpl.name }}</h4>
+                                    {% if tpl.is_default %}
+                                    <span class="badge badge-sm color-success">{% trans "Default" %}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="badge badge-sm">{{ tpl.get_paper_size_display }}</span>
+                                    <span class="text-xs text-muted">v{{ tpl.version }}</span>
+                                    {% if not tpl.is_active %}
+                                    <span class="badge badge-sm color-warning">{% trans "Inactive" %}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <button class="btn btn-ghost btn-sm btn-circle"
+                                    @click="showActions = !showActions">
+                                    {% icon "ellipsis-vertical" %}
+                                </button>
+                                <div class="absolute right-0 top-full mt-1 bg-base-100 border border-base-300 rounded-lg shadow-lg z-10 min-w-[160px]"
+                                     x-show="showActions"
+                                     @click.outside="showActions = false"
+                                     x-transition>
+                                    <div class="py-1">
+                                        <button class="w-full text-left px-4 py-2 text-sm hover:bg-base-200 flex items-center gap-2"
+                                            hx-get="{% url 'doc_templates:template_edit' tpl.pk %}"
+                                            hx-target="#main-content-area"
+                                            hx-push-url="true"
+                                            @click="showActions = false">
+                                            {% icon "create-outline" css_class="text-sm" %}
+                                            {% trans "Edit" %}
+                                        </button>
+                                        <button class="w-full text-left px-4 py-2 text-sm hover:bg-base-200 flex items-center gap-2"
+                                            hx-get="{% url 'doc_templates:template_preview' tpl.pk %}"
+                                            hx-target="#template-preview-container"
+                                            @click="showActions = false">
+                                            {% icon "eye-outline" css_class="text-sm" %}
+                                            {% trans "Preview" %}
+                                        </button>
+                                        <button class="w-full text-left px-4 py-2 text-sm hover:bg-base-200 flex items-center gap-2"
+                                            hx-post="{% url 'doc_templates:template_duplicate' tpl.pk %}"
+                                            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                                            hx-swap="none"
+                                            @click="showActions = false"
+                                            hx-on::after-request="if(event.detail.successful) location.reload();">
+                                            {% icon "copy-outline" css_class="text-sm" %}
+                                            {% trans "Duplicate" %}
+                                        </button>
+                                        {% if not tpl.is_default %}
+                                        <button class="w-full text-left px-4 py-2 text-sm hover:bg-base-200 flex items-center gap-2"
+                                            hx-post="{% url 'doc_templates:template_set_default' tpl.pk %}"
+                                            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                                            hx-swap="none"
+                                            @click="showActions = false"
+                                            hx-on::after-request="if(event.detail.successful) location.reload();">
+                                            {% icon "star-outline" css_class="text-sm" %}
+                                            {% trans "Set as Default" %}
+                                        </button>
+                                        {% endif %}
+                                        <div class="border-t border-base-300 my-1"></div>
+                                        <button class="w-full text-left px-4 py-2 text-sm hover:bg-base-200 flex items-center gap-2 text-error"
+                                            hx-post="{% url 'doc_templates:template_delete' tpl.pk %}"
+                                            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                                            hx-swap="none"
+                                            hx-confirm="{% trans 'Are you sure you want to delete this template?' %}"
+                                            @click="showActions = false"
+                                            hx-on::after-request="if(event.detail.successful) location.reload();">
+                                            {% icon "trash-outline" css_class="text-sm" %}
+                                            {% trans "Delete" %}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <!-- Empty state -->
+        <div class="card">
+            <div class="card-body text-center py-12">
+                {% icon "document-text-outline" css_class="text-5xl block mx-auto mb-3 text-muted" %}
+                <h3 class="text-lg font-medium mb-2">{% trans "No templates yet" %}</h3>
+                <p class="text-muted mb-4">{% trans "Create your first document template to get started." %}</p>
+                <button class="btn color-primary"
+                    hx-get="{% url 'doc_templates:template_create' %}"
+                    hx-target="#main-content-area"
+                    hx-push-url="true">
+                    {% icon "add-outline" %}
+                    {% trans "Create Template" %}
+                </button>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Preview container (for modals/previews loaded via HTMX) -->
+    <div id="template-preview-container"></div>
+</div>

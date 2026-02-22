@@ -1,0 +1,197 @@
+{% load i18n %}
+{% load djicons %}
+
+<div class="p-4">
+    <!-- Header -->
+    <div class="flex items-center gap-3 mb-6">
+        <button class="btn btn-ghost btn-sm"
+            hx-get="{% url 'doc_templates:dashboard' %}"
+            hx-target="#main-content-area"
+            hx-push-url="true">
+            {% icon "arrow-back-outline" %}
+        </button>
+        <h2 class="text-xl font-semibold">
+            {% if editing %}
+                {% trans "Edit Template" %}: {{ template.name }}
+            {% else %}
+                {% trans "New Template" %}
+            {% endif %}
+        </h2>
+    </div>
+
+    {% if success %}
+    <div class="callout callout-success mb-4">
+        <div class="callout-icon">{% icon "checkmark-circle-outline" %}</div>
+        <div class="callout-content">
+            <div class="callout-text">{{ message }}</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Left column: Form fields -->
+            <div class="space-y-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">{% icon "information-circle-outline" css_class="text-primary" %} {% trans "Basic Info" %}</h3>
+                    </div>
+                    <div class="card-body space-y-4">
+                        <!-- Name -->
+                        <div class="form-group">
+                            <label class="form-group-label">{% trans "Name" %}</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                            <p class="text-xs text-error mt-1">{{ form.name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Doc Type & Paper Size -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label class="form-group-label">{% trans "Document Type" %}</label>
+                                {{ form.doc_type }}
+                            </div>
+                            <div class="form-group">
+                                <label class="form-group-label">{% trans "Paper Size" %}</label>
+                                {{ form.paper_size }}
+                            </div>
+                        </div>
+
+                        <!-- Status toggles -->
+                        <div class="flex items-center gap-6">
+                            <label class="flex items-center gap-2">
+                                <span class="toggle color-success">
+                                    {{ form.is_active }}
+                                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                                </span>
+                                <span class="text-sm">{% trans "Active" %}</span>
+                            </label>
+                            <label class="flex items-center gap-2">
+                                <span class="toggle color-primary">
+                                    {{ form.is_default }}
+                                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                                </span>
+                                <span class="text-sm">{% trans "Default" %}</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">{% icon "code-outline" css_class="text-primary" %} {% trans "Template Content" %}</h3>
+                    </div>
+                    <div class="card-body space-y-4">
+                        <div class="form-group">
+                            <label class="form-group-label">{% trans "Header" %}</label>
+                            {{ form.header_content }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-group-label">{% trans "Body Content" %}</label>
+                            {{ form.content }}
+                            {% if form.content.errors %}
+                            <p class="text-xs text-error mt-1">{{ form.content.errors.0 }}</p>
+                            {% endif %}
+                            <p class="text-xs text-muted mt-1">{% trans "Use {{variable}} syntax for dynamic content" %}</p>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-group-label">{% trans "Footer" %}</label>
+                            {{ form.footer_content }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CSS Styles -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">{% icon "color-palette-outline" css_class="text-warning" %} {% trans "Custom CSS" %}</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            {{ form.css_styles }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center gap-3">
+                    <button type="submit" class="btn color-primary">
+                        {% icon "save-outline" %}
+                        {% if editing %}{% trans "Save Changes" %}{% else %}{% trans "Create Template" %}{% endif %}
+                    </button>
+                    <button type="button" class="btn btn-outline"
+                        hx-get="{% url 'doc_templates:dashboard' %}"
+                        hx-target="#main-content-area"
+                        hx-push-url="true">
+                        {% trans "Cancel" %}
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right column: Available variables reference -->
+            <div>
+                <div class="card sticky top-4">
+                    <div class="card-header">
+                        <h3 class="card-title">{% icon "help-circle-outline" css_class="text-success" %} {% trans "Available Variables" %}</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-sm text-muted mb-3">{% trans "Click to copy. Use these in your template content." %}</p>
+                        <div class="space-y-3">
+                            <div>
+                                <div class="text-xs font-medium text-muted uppercase mb-1">{% trans "Company" %}</div>
+                                <div class="flex flex-wrap gap-1">
+                                    {% for var in "company.name,company.address,company.phone,company.tax_id,company.email,company.website"|make_list %}{% endfor %}
+                                    <code class="text-xs bg-base-200 px-2 py-1 rounded cursor-pointer hover:bg-primary/10" onclick="navigator.clipboard.writeText('{% templatetag openvariable %}company.name{% templatetag closevariable %}')">{% templatetag openvariable %}company.name{% templatetag closevariable %}</code>
+                                    <code class="text-xs bg-base-200 px-2 py-1 rounded cursor-pointer hover:bg-primary/10" onclick="navigator.clipboard.writeText('{% templatetag openvariable %}company.address{% templatetag closevariable %}')">{% templatetag openvariable %}company.address{% templatetag closevariable %}</code>
+                                    <code class="text-xs bg-base-200 px-2 py-1 rounded cursor-pointer hover:bg-primary/10" onclick="navigator.clipboard.writeText('{% templatetag openvariable %}company.phone{% templatetag closevariable %}')">{% templatetag openvariable %}company.phone{% templatetag closevariable %}</code>
+                                    <code class="text-xs bg-base-200 px-2 py-1 rounded cursor-pointer hover:bg-primary/10" onclick="navigator.clipboard.writeText('{% templatetag openvariable %}company.tax_id{% templatetag closevariable %}')">{% templatetag openvariable %}company.tax_id{% templatetag closevariable %}</code>
+                                    <code class="text-xs bg-base-200 px-2 py-1 rounded cursor-pointer hover:bg-primary/10" onclick="navigator.clipboard.writeText('{% templatetag openvariable %}company.email{% templatetag closevariable %}')">{% templatetag openvariable %}company.email{% templatetag closevariable %}</code>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="text-xs font-medium text-muted uppercase mb-1">{% trans "Sale" %}</div>
+                                <div class="flex flex-wrap gap-1">
+                                    <code class="text-xs bg-base-200 px-2 py-1 rounded cursor-pointer hover:bg-primary/10" onclick="navigator.clipboard.writeText('{% templatetag openvariable %}sale.number{% templatetag closevariable %}')">{% templatetag openvariable %}sale.number{% templatetag closevariable %}</code>
+                                    <code class="text-xs bg-base-200 px-2 py-1 rounded cursor-pointer hover:bg-primary/10" onclick="navigator.clipboard.writeText('{% templatetag openvariable %}sale.date{% templatetag closevariable %}')">{% templatetag openvariable %}sale.date{% templatetag closevariable %}</code>
+                                    <code class="text-xs bg-base-200 px-2 py-1 rounded cursor-pointer hover:bg-primary/10" onclick="navigator.clipboard.writeText('{% templatetag openvariable %}sale.total{% templatetag closevariable %}')">{% templatetag openvariable %}sale.total{% templatetag closevariable %}</code>
+                                    <code class="text-xs bg-base-200 px-2 py-1 rounded cursor-pointer hover:bg-primary/10" onclick="navigator.clipboard.writeText('{% templatetag openvariable %}sale.subtotal{% templatetag closevariable %}')">{% templatetag openvariable %}sale.subtotal{% templatetag closevariable %}</code>
+                                    <code class="text-xs bg-base-200 px-2 py-1 rounded cursor-pointer hover:bg-primary/10" onclick="navigator.clipboard.writeText('{% templatetag openvariable %}sale.tax{% templatetag closevariable %}')">{% templatetag openvariable %}sale.tax{% templatetag closevariable %}</code>
+                                    <code class="text-xs bg-base-200 px-2 py-1 rounded cursor-pointer hover:bg-primary/10" onclick="navigator.clipboard.writeText('{% templatetag openvariable %}sale.items{% templatetag closevariable %}')">{% templatetag openvariable %}sale.items{% templatetag closevariable %}</code>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="text-xs font-medium text-muted uppercase mb-1">{% trans "Customer" %}</div>
+                                <div class="flex flex-wrap gap-1">
+                                    <code class="text-xs bg-base-200 px-2 py-1 rounded cursor-pointer hover:bg-primary/10" onclick="navigator.clipboard.writeText('{% templatetag openvariable %}customer.name{% templatetag closevariable %}')">{% templatetag openvariable %}customer.name{% templatetag closevariable %}</code>
+                                    <code class="text-xs bg-base-200 px-2 py-1 rounded cursor-pointer hover:bg-primary/10" onclick="navigator.clipboard.writeText('{% templatetag openvariable %}customer.email{% templatetag closevariable %}')">{% templatetag openvariable %}customer.email{% templatetag closevariable %}</code>
+                                    <code class="text-xs bg-base-200 px-2 py-1 rounded cursor-pointer hover:bg-primary/10" onclick="navigator.clipboard.writeText('{% templatetag openvariable %}customer.phone{% templatetag closevariable %}')">{% templatetag openvariable %}customer.phone{% templatetag closevariable %}</code>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="text-xs font-medium text-muted uppercase mb-1">{% trans "Invoice" %}</div>
+                                <div class="flex flex-wrap gap-1">
+                                    <code class="text-xs bg-base-200 px-2 py-1 rounded cursor-pointer hover:bg-primary/10" onclick="navigator.clipboard.writeText('{% templatetag openvariable %}invoice.number{% templatetag closevariable %}')">{% templatetag openvariable %}invoice.number{% templatetag closevariable %}</code>
+                                    <code class="text-xs bg-base-200 px-2 py-1 rounded cursor-pointer hover:bg-primary/10" onclick="navigator.clipboard.writeText('{% templatetag openvariable %}invoice.date{% templatetag closevariable %}')">{% templatetag openvariable %}invoice.date{% templatetag closevariable %}</code>
+                                    <code class="text-xs bg-base-200 px-2 py-1 rounded cursor-pointer hover:bg-primary/10" onclick="navigator.clipboard.writeText('{% templatetag openvariable %}invoice.due_date{% templatetag closevariable %}')">{% templatetag openvariable %}invoice.due_date{% templatetag closevariable %}</code>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <button type="button" class="btn btn-ghost btn-sm"
+                                hx-get="{% url 'doc_templates:variables' %}"
+                                hx-target="#main-content-area"
+                                hx-push-url="true">
+                                {% icon "open-outline" css_class="text-sm" %}
+                                {% trans "All Variables" %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

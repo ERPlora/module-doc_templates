@@ -1,0 +1,26 @@
+{% load i18n %}
+
+<div class="space-y-4">
+    <div class="form-group">
+        <label class="form-group-label">{% trans "Name" %}</label>
+        {{ form.name }}
+    </div>
+    <div class="form-group">
+        <label class="form-group-label">{% trans "Description" %}</label>
+        {{ form.description }}
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+        <div class="form-group">
+            <label class="form-group-label">{% trans "Group" %}</label>
+            {{ form.variable_group }}
+        </div>
+        <div class="form-group">
+            <label class="form-group-label">{% trans "Data Type" %}</label>
+            {{ form.data_type }}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="form-group-label">{% trans "Example Value" %}</label>
+        {{ form.example_value }}
+    </div>
+</div>

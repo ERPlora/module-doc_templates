@@ -1,0 +1,150 @@
+{% load i18n %}
+{% load djicons %}
+
+<script>
+function docTemplateSettingsApp() {
+    return {
+        saving: false,
+
+        async saveSettings(event) {
+            this.saving = true;
+            const form = event.target.closest('form') || document.getElementById('settings-form');
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('{% url "doc_templates:settings_save" %}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    },
+                    body: formData,
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    this.showToast('{% trans "Settings saved successfully" %}', 'success');
+                } else {
+                    throw new Error(result.error || '{% trans "Error saving settings" %}');
+                }
+            } catch (error) {
+                console.error('[DocTemplates Settings] Error:', error);
+                this.showToast(error.message || '{% trans "Error saving settings" %}', 'error');
+            } finally {
+                this.saving = false;
+            }
+        },
+
+        showToast(message, type = 'primary') {
+            if (window.UX && window.UX.toast) {
+                window.UX.toast(message, { type: type });
+            } else {
+                console.log('[Toast]', type, message);
+            }
+        },
+    };
+}
+</script>
+
+{% csrf_token %}
+<div x-data="docTemplateSettingsApp()" class="p-4">
+
+    <form id="settings-form" method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Paper & Font Defaults -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{% icon "document-text-outline" css_class="text-primary" %} {% trans "Default Settings" %}</h3>
+            </div>
+            <div class="card-body">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="form-group-label">{% trans "Default Paper Size" %}</label>
+                        {{ settings_form.default_paper_size }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-group-label">{% trans "Default Font Size" %}</label>
+                        {{ settings_form.default_font_size }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Company Info -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-text">
+                    <h3 class="card-title">{% icon "business-outline" css_class="text-success" %} {% trans "Company Information" %}</h3>
+                    <p class="card-subtitle">{% trans "Used as default values for company variables in templates" %}</p>
+                </div>
+            </div>
+            <div class="card-body space-y-4">
+                <!-- Logo -->
+                <div class="form-group">
+                    <label class="form-group-label">{% trans "Company Logo" %}</label>
+                    {% if settings.company_logo %}
+                    <div class="flex items-center gap-4 mb-2">
+                        <img src="{{ settings.company_logo.url }}" class="w-20 h-20 object-contain rounded border border-base-300 bg-white p-1" alt="Logo" />
+                    </div>
+                    {% endif %}
+                    <input type="file" name="company_logo" accept="image/*" class="input" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-group-label">{% trans "Company Name" %}</label>
+                    {{ settings_form.company_name }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-group-label">{% trans "Address" %}</label>
+                    {{ settings_form.company_address }}
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="form-group-label">{% trans "Tax ID" %}</label>
+                        {{ settings_form.company_tax_id }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-group-label">{% trans "Phone" %}</label>
+                        {{ settings_form.company_phone }}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="form-group-label">{% trans "Email" %}</label>
+                        {{ settings_form.company_email }}
+                    </div>
+                    <div class="form-group">
+                        <label class="form-group-label">{% trans "Website" %}</label>
+                        {{ settings_form.company_website }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Text -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">{% icon "text-outline" css_class="text-warning" %} {% trans "Default Footer" %}</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-group-label">{% trans "Footer Text" %}</label>
+                    {{ settings_form.footer_text }}
+                    <p class="text-xs text-muted mt-1">{% trans "Default footer text used in all templates unless overridden" %}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Save Button -->
+        <div class="flex items-center gap-3">
+            <button type="button" class="btn color-primary" @click="saveSettings($event)" :disabled="saving">
+                <span x-show="!saving">{% icon "save-outline" %} {% trans "Save Settings" %}</span>
+                <span x-show="saving" class="loading loading-sm"></span>
+            </button>
+        </div>
+    </form>
+</div>

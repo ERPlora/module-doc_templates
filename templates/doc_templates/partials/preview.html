@@ -1,0 +1,35 @@
+{% load i18n %}
+{% load djicons %}
+
+<!-- Preview Modal (loaded via HTMX into #template-preview-container) -->
+<div x-data="{ open: true }" x-init="$nextTick(() => open = true)">
+    <div class="modal-backdrop" :data-state="open ? 'open' : 'closed'" @click.self="open = false; $el.parentElement.innerHTML = ''">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    {% icon "eye-outline" css_class="text-primary" %}
+                    {{ template.name }} - {% trans "Preview" %}
+                </h3>
+                <button class="modal-close" @click="open = false; $el.closest('[x-data]').innerHTML = ''">&times;</button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="bg-white text-black p-6" style="font-family: 'Courier New', monospace; font-size: {{ template.paper_size|default:'12' }}px;">
+                    {% if template.css_styles %}
+                    <style>{{ template.css_styles }}</style>
+                    {% endif %}
+                    {{ rendered_content|safe }}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="flex items-center gap-2">
+                    <span class="badge badge-sm">{{ template.get_paper_size_display }}</span>
+                    <span class="badge badge-sm">{{ template.get_doc_type_display }}</span>
+                    <span class="text-xs text-muted">v{{ template.version }}</span>
+                </div>
+                <button class="btn btn-outline" @click="open = false; $el.closest('[x-data]').innerHTML = ''">
+                    {% trans "Close" %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
