@@ -1,7 +1,7 @@
 import json
 import uuid
 
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -128,10 +128,10 @@ def template_delete(request, pk):
     """Soft delete a template."""
     hub = _hub_id(request)
 
+    template = get_object_or_404(
+        DocumentTemplate, pk=pk, hub_id=hub, is_deleted=False,
+    )
     try:
-        template = get_object_or_404(
-            DocumentTemplate, pk=pk, hub_id=hub, is_deleted=False,
-        )
         template.is_deleted = True
         template.deleted_at = timezone.now()
         template.save(update_fields=['is_deleted', 'deleted_at', 'updated_at'])
@@ -147,11 +147,10 @@ def template_duplicate(request, pk):
     """Duplicate an existing template."""
     hub = _hub_id(request)
 
+    original = get_object_or_404(
+        DocumentTemplate, pk=pk, hub_id=hub, is_deleted=False,
+    )
     try:
-        original = get_object_or_404(
-            DocumentTemplate, pk=pk, hub_id=hub, is_deleted=False,
-        )
-
         new_template = DocumentTemplate.objects.create(
             hub_id=hub,
             name=f"{original.name} ({_('Copy')})",
@@ -279,11 +278,10 @@ def variable_delete(request, pk):
     """Delete a custom variable (system variables cannot be deleted)."""
     hub = _hub_id(request)
 
+    variable = get_object_or_404(
+        TemplateVariable, pk=pk, hub_id=hub, is_deleted=False,
+    )
     try:
-        variable = get_object_or_404(
-            TemplateVariable, pk=pk, hub_id=hub, is_deleted=False,
-        )
-
         if variable.is_system:
             return JsonResponse({
                 'success': False,
@@ -355,6 +353,8 @@ def api_render(request):
             'success': False,
             'error': str(_('Invalid JSON body')),
         }, status=400)
+    except Http404:
+        raise
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
