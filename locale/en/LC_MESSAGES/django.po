@@ -1,0 +1,399 @@
+# English translations for Document Templates
+# Copyright (C) 2025
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-02-25 00:00+0000\n"
+"PO-Revision-Date: 2026-02-25 00:00+0000\n"
+"Last-Translator: ERPlora Team <info@erplora.com>\n"
+"Language: en\n"
+"Language-Team: English\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: module.py
+msgid "Document Templates"
+msgstr "Document Templates"
+
+msgid "Customizable document templates for receipts, invoices, and reports"
+msgstr "Customizable document templates for receipts, invoices, and reports"
+
+msgid "Templates"
+msgstr "Templates"
+
+msgid "Variables"
+msgstr "Variables"
+
+msgid "Settings"
+msgstr "Settings"
+
+#: models.py - PAPER_SIZE_CHOICES
+msgid "Thermal 80mm"
+msgstr "Thermal 80mm"
+
+msgid "Thermal 58mm"
+msgstr "Thermal 58mm"
+
+msgid "A4"
+msgstr "A4"
+
+msgid "A5"
+msgstr "A5"
+
+msgid "Letter"
+msgstr "Letter"
+
+#: models.py - TemplateSettings
+msgid "Default Paper Size"
+msgstr "Default Paper Size"
+
+msgid "Default Font Size"
+msgstr "Default Font Size"
+
+msgid "Company Logo"
+msgstr "Company Logo"
+
+msgid "Company Name"
+msgstr "Company Name"
+
+msgid "Company Address"
+msgstr "Company Address"
+
+msgid "Tax ID"
+msgstr "Tax ID"
+
+msgid "Phone"
+msgstr "Phone"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Website"
+msgstr "Website"
+
+msgid "Footer Text"
+msgstr "Footer Text"
+
+msgid "Template Settings"
+msgstr "Template Settings"
+
+#: models.py - DOC_TYPE_CHOICES
+msgid "Receipt"
+msgstr "Receipt"
+
+msgid "Invoice"
+msgstr "Invoice"
+
+msgid "Quote"
+msgstr "Quote"
+
+msgid "Credit Note"
+msgstr "Credit Note"
+
+msgid "Delivery Note"
+msgstr "Delivery Note"
+
+msgid "Custom"
+msgstr "Custom"
+
+#: models.py - DocumentTemplate
+msgid "Name"
+msgstr "Name"
+
+msgid "Document Type"
+msgstr "Document Type"
+
+msgid "Paper Size"
+msgstr "Paper Size"
+
+msgid "Content"
+msgstr "Content"
+
+msgid "Template content with variable placeholders {{variable}}"
+msgstr "Template content with variable placeholders {{variable}}"
+
+msgid "Header Content"
+msgstr "Header Content"
+
+msgid "Footer Content"
+msgstr "Footer Content"
+
+msgid "CSS Styles"
+msgstr "CSS Styles"
+
+msgid "Custom CSS for this template"
+msgstr "Custom CSS for this template"
+
+msgid "Is Default"
+msgstr "Is Default"
+
+msgid "Active"
+msgstr "Active"
+
+msgid "Version"
+msgstr "Version"
+
+msgid "Document Template"
+msgstr "Document Template"
+
+msgid "Document Templates"
+msgstr "Document Templates"
+
+#: models.py - VARIABLE_GROUP_CHOICES
+msgid "Sale"
+msgstr "Sale"
+
+msgid "Customer"
+msgstr "Customer"
+
+msgid "Product"
+msgstr "Product"
+
+msgid "Company"
+msgstr "Company"
+
+#: models.py - DATA_TYPE_CHOICES
+msgid "Text"
+msgstr "Text"
+
+msgid "Number"
+msgstr "Number"
+
+msgid "Date"
+msgstr "Date"
+
+msgid "Currency"
+msgstr "Currency"
+
+msgid "Image"
+msgstr "Image"
+
+msgid "List"
+msgstr "List"
+
+#: models.py - TemplateVariable
+msgid "Description"
+msgstr "Description"
+
+msgid "Variable name e.g. {{sale.total}}"
+msgstr "Variable name e.g. {{sale.total}}"
+
+msgid "Group"
+msgstr "Group"
+
+msgid "Data Type"
+msgstr "Data Type"
+
+msgid "Example Value"
+msgstr "Example Value"
+
+msgid "System Variable"
+msgstr "System Variable"
+
+msgid "System variables cannot be deleted"
+msgstr "System variables cannot be deleted"
+
+msgid "Template Variable"
+msgstr "Template Variable"
+
+msgid "Template Variables"
+msgstr "Template Variables"
+
+#: models.py - GeneratedDocument
+msgid "Template"
+msgstr "Template"
+
+msgid "Source ID"
+msgstr "Source ID"
+
+msgid "ID of the source object (sale, invoice, etc.)"
+msgstr "ID of the source object (sale, invoice, etc.)"
+
+msgid "Rendered Content"
+msgstr "Rendered Content"
+
+msgid "File"
+msgstr "File"
+
+msgid "Generated At"
+msgstr "Generated At"
+
+msgid "Generated Document"
+msgstr "Generated Document"
+
+msgid "Generated Documents"
+msgstr "Generated Documents"
+
+msgid "Deleted Template"
+msgstr "Deleted Template"
+
+#: views.py
+msgid "Template created successfully"
+msgstr "Template created successfully"
+
+msgid "Template updated successfully"
+msgstr "Template updated successfully"
+
+msgid "Copy"
+msgstr "Copy"
+
+msgid "template_id is required"
+msgstr "template_id is required"
+
+msgid "Invalid JSON body"
+msgstr "Invalid JSON body"
+
+#: templates - dashboard
+msgid "templates"
+msgstr "templates"
+
+msgid "active"
+msgstr "active"
+
+msgid "New Template"
+msgstr "New Template"
+
+msgid "Default"
+msgstr "Default"
+
+msgid "Inactive"
+msgstr "Inactive"
+
+msgid "Edit"
+msgstr "Edit"
+
+msgid "Preview"
+msgstr "Preview"
+
+msgid "Duplicate"
+msgstr "Duplicate"
+
+msgid "Set as Default"
+msgstr "Set as Default"
+
+msgid "Are you sure you want to delete this template?"
+msgstr "Are you sure you want to delete this template?"
+
+msgid "Delete"
+msgstr "Delete"
+
+msgid "No templates yet"
+msgstr "No templates yet"
+
+msgid "Create your first document template to get started."
+msgstr "Create your first document template to get started."
+
+msgid "Create Template"
+msgstr "Create Template"
+
+#: templates - variables
+msgid "Template Variables"
+msgstr "Template Variables"
+
+msgid "Variables available for use in document templates"
+msgstr "Variables available for use in document templates"
+
+msgid "Add Variable"
+msgstr "Add Variable"
+
+msgid "System"
+msgstr "System"
+
+msgid "Delete this variable?"
+msgstr "Delete this variable?"
+
+msgid "No variables defined"
+msgstr "No variables defined"
+
+msgid "Add variables to use in your templates."
+msgstr "Add variables to use in your templates."
+
+msgid "New Variable"
+msgstr "New Variable"
+
+msgid "e.g. custom.loyalty_points"
+msgstr "e.g. custom.loyalty_points"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Create"
+msgstr "Create"
+
+msgid "Error creating variable"
+msgstr "Error creating variable"
+
+#: templates - template_form
+msgid "Edit Template"
+msgstr "Edit Template"
+
+msgid "Basic Info"
+msgstr "Basic Info"
+
+msgid "Template Content"
+msgstr "Template Content"
+
+msgid "Header"
+msgstr "Header"
+
+msgid "Body Content"
+msgstr "Body Content"
+
+msgid "Use {{variable}} syntax for dynamic content"
+msgstr "Use {{variable}} syntax for dynamic content"
+
+msgid "Footer"
+msgstr "Footer"
+
+msgid "Custom CSS"
+msgstr "Custom CSS"
+
+msgid "Save Changes"
+msgstr "Save Changes"
+
+msgid "Available Variables"
+msgstr "Available Variables"
+
+msgid "Click to copy. Use these in your template content."
+msgstr "Click to copy. Use these in your template content."
+
+msgid "All Variables"
+msgstr "All Variables"
+
+msgid "Close"
+msgstr "Close"
+
+msgid "Update"
+msgstr "Update"
+
+#: templates - settings
+msgid "Default Settings"
+msgstr "Default Settings"
+
+msgid "Company Information"
+msgstr "Company Information"
+
+msgid "Used as default values for company variables in templates"
+msgstr "Used as default values for company variables in templates"
+
+msgid "Address"
+msgstr "Address"
+
+msgid "Default Footer"
+msgstr "Default Footer"
+
+msgid "Default footer text used in all templates unless overridden"
+msgstr "Default footer text used in all templates unless overridden"
+
+msgid "Save Settings"
+msgstr "Save Settings"
+
+msgid "Settings saved successfully"
+msgstr "Settings saved successfully"
+
+msgid "Error saving settings"
+msgstr "Error saving settings"
