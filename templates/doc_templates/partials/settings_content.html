@@ -1,9 +1,8 @@
 {% load i18n %}
 {% load djicons %}
 
-<script>
-function docTemplateSettingsApp() {
-    return {
+{% csrf_token %}
+<div x-data="{
         saving: false,
 
         async saveSettings(event) {
@@ -12,7 +11,7 @@ function docTemplateSettingsApp() {
             const formData = new FormData(form);
 
             try {
-                const response = await fetch('{% url "doc_templates:settings_save" %}', {
+                const response = await fetch('{% url 'doc_templates:settings_save' %}', {
                     method: 'POST',
                     headers: {
                         'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
@@ -23,31 +22,18 @@ function docTemplateSettingsApp() {
                 const result = await response.json();
 
                 if (response.ok && result.success) {
-                    this.showToast('{% trans "Settings saved successfully" %}', 'success');
+                    window.showToast('{% trans 'Settings saved successfully' %}', 'success');
                 } else {
-                    throw new Error(result.error || '{% trans "Error saving settings" %}');
+                    throw new Error(result.error || '{% trans 'Error saving settings' %}');
                 }
             } catch (error) {
                 console.error('[DocTemplates Settings] Error:', error);
-                this.showToast(error.message || '{% trans "Error saving settings" %}', 'error');
+                window.showToast(error.message || '{% trans 'Error saving settings' %}', 'error');
             } finally {
                 this.saving = false;
             }
         },
-
-        showToast(message, type = 'primary') {
-            if (window.UX && window.UX.toast) {
-                window.UX.toast(message, { type: type });
-            } else {
-                console.log('[Toast]', type, message);
-            }
-        },
-    };
-}
-</script>
-
-{% csrf_token %}
-<div x-data="docTemplateSettingsApp()" class="p-4">
+    }" class="p-4">
 
     <form id="settings-form" method="post" enctype="multipart/form-data" class="space-y-6">
         {% csrf_token %}

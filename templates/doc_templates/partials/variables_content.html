@@ -1,7 +1,43 @@
 {% load i18n %}
 {% load djicons %}
 
-<div class="p-4" x-data="variablesApp()">
+<div class="p-4" x-data="{
+        showCreateForm: false,
+
+        async createVariable() {
+            const form = {
+                name: document.querySelector('[name=name]').value,
+                description: document.querySelector('[name=description]').value,
+                variable_group: document.querySelector('[name=variable_group]').value,
+                data_type: document.querySelector('[name=data_type]').value,
+                example_value: document.querySelector('[name=example_value]').value,
+            };
+
+            const formData = new FormData();
+            Object.entries(form).forEach(([k, v]) => formData.append(k, v));
+
+            try {
+                const response = await fetch('{% url 'doc_templates:variable_create' %}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    },
+                    body: formData,
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    this.showCreateForm = false;
+                    location.reload();
+                } else {
+                    window.showToast('{% trans 'Error creating variable' %}', 'error');
+                }
+            } catch (error) {
+                console.error('[DocTemplates] Error:', error);
+            }
+        },
+    }">
     <!-- Header -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
@@ -113,47 +149,3 @@
         </div>
     </div>
 </div>
-
-<script>
-function variablesApp() {
-    return {
-        showCreateForm: false,
-
-        async createVariable() {
-            const form = {
-                name: document.querySelector('[name="name"]').value,
-                description: document.querySelector('[name="description"]').value,
-                variable_group: document.querySelector('[name="variable_group"]').value,
-                data_type: document.querySelector('[name="data_type"]').value,
-                example_value: document.querySelector('[name="example_value"]').value,
-            };
-
-            const formData = new FormData();
-            Object.entries(form).forEach(([k, v]) => formData.append(k, v));
-
-            try {
-                const response = await fetch('{% url "doc_templates:variable_create" %}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                    },
-                    body: formData,
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    this.showCreateForm = false;
-                    location.reload();
-                } else {
-                    if (window.UX && window.UX.toast) {
-                        window.UX.toast('{% trans "Error creating variable" %}', { type: 'error' });
-                    }
-                }
-            } catch (error) {
-                console.error('[DocTemplates] Error:', error);
-            }
-        },
-    };
-}
-</script>
