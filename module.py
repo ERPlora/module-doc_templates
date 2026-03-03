@@ -29,3 +29,16 @@ PERMISSIONS = [
     'doc_templates.delete_template',
     'doc_templates.manage_settings',
 ]
+
+ROLE_PERMISSIONS = {
+    "admin": ["*"],
+    "manager": [
+        "add_template",
+        "change_template",
+        "view_template",
+    ],
+    "employee": [
+        "add_template",
+        "view_template",
+    ],
+}
