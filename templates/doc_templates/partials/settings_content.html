@@ -14,10 +14,8 @@
                 const response = await fetch('{% url 'doc_templates:settings_save' %}', {
                     method: 'POST',
                     headers: {
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                    },
-                    body: formData,
-                });
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value},
+                    body: formData},
 
                 const result = await response.json();
 
@@ -32,8 +30,7 @@
             } finally {
                 this.saving = false;
             }
-        },
-    }" class="p-4">
+        }}" class="p-4">
 
     <form id="settings-form" method="post" enctype="multipart/form-data" class="space-y-6">
         {% csrf_token %}
