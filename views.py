@@ -385,6 +385,8 @@ def settings_view(request):
 @permission_required('doc_templates.manage_settings')
 def settings_save(request):
     """Save template settings."""
+    from apps.core.media_helpers import handle_image_field
+
     hub = _hub_id(request)
 
     try:
@@ -392,7 +394,9 @@ def settings_save(request):
         form = TemplateSettingsForm(request.POST, request.FILES, instance=settings)
 
         if form.is_valid():
-            form.save()
+            instance = form.save()
+            handle_image_field(request, instance, 'company_logo')
+            instance.save()
             return JsonResponse({'success': True})
 
         return JsonResponse({

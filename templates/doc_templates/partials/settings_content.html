@@ -67,11 +67,10 @@
                 <div class="form-group">
                     <label class="form-group-label">{% trans "Company Logo" %}</label>
                     {% if settings.company_logo %}
-                    <div class="flex items-center gap-4 mb-2">
-                        <img src="{{ settings.company_logo.url }}" class="w-20 h-20 object-contain rounded border border-base-300 bg-white p-1" alt="Logo" />
-                    </div>
+                    {% include "core/components/media_picker.html" with field_name="company_logo" current_url=settings.company_logo.url folder="logos" %}
+                    {% else %}
+                    {% include "core/components/media_picker.html" with field_name="company_logo" current_url="" folder="logos" %}
                     {% endif %}
-                    <input type="file" name="company_logo" accept="image/*" class="input" />
                 </div>
 
                 <div class="form-group">
